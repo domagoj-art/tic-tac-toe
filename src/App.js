@@ -1,3 +1,4 @@
+import { calculateNewValue } from '@testing-library/user-event/dist/utils';
 import './App.css';
 import { useState } from 'react';
 function Sauare({value, onSquareClick}){
@@ -15,7 +16,7 @@ export default function Board(){
   const [squares, setSquares] = useState(Array(9).fill(null));
   
   function handleClick(i){
-    if(squares[i]){
+    if(squares[i] || claculateWinner(squares)){
       return;
     }
     const nextSquares = squares.slice();
@@ -29,8 +30,17 @@ export default function Board(){
     setXIsNext(!xIsNext);
   }
 
+  const winner = claculateWinner(squares);
+  let status;
+  if(winner){
+    status = "winner" + winner;
+  }else{
+    status = "next is " + (xIsNext ? "X" : "O");
+  }
+
 return (
 <>
+  <div className='status'>{status}</div>
   <div className="board-row">
     <Sauare value={squares[0]} onSquareClick={() => handleClick(0)}/>
     <Sauare value={squares[1]} onSquareClick={() => handleClick(1)}/>
@@ -48,4 +58,23 @@ return (
   </div>
 </>
 );
+}
+function claculateWinner(squares){
+  const lines = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [2,4,6]
+  ]
+  for(let i = 0; i < lines.length; i++){
+    const [a, b, c] = lines[i];
+    if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c]){
+      return squares[a];
+    }
+  }
+  return null;
 }
